@@ -1,4 +1,6 @@
 import {Router} from 'express'
+import express from 'express'
+import {createHash} from '../util.js';
 import bodyParser from 'body-parser'
 import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken';
@@ -17,7 +19,7 @@ const transport = nodemailer.createTransport({
   }
 })
 
-router.use(bodyParser.urlencoded({ extended: true }));
+router.use(express.urlencoded({ extended: true }));
 
 // Login con email con error
 
@@ -114,7 +116,6 @@ catch (error){
   
   try {
     let email = req.body.email;
-    console.log ('**email**', email)
     if (!validarCorreoElectronico(email)) {
       return res.status(404).send('el mail informado no tiene un formato válido')
     }
@@ -146,36 +147,38 @@ catch (error){
 // efectuar la recuperación de la contraseña
 
 async function recuperacion (req,res,next) {
-  const { email, token, newPassword } = req.body;
-  try {
-    const decoded = jwt.verify(token, config.JWT_SECRET);
-    next
-  } catch (error) {
-    return res.status(401).send(`permiso caducado o corrupto ${error}`);
-  }
+  let { email, newPassword } = req.body;
+   let usuario
   try {
     if (!validarCorreoElectronico(email)) {
       return res.status(404).send('el mail informado no tiene un formato válido')
     }
-    const usuario = await usersServices.obtenerUsuarioPorEmail(email);
+    const direccionDeMail = {}
+    direccionDeMail.username = email
+    usuario = await usersServices.obtenerUsuarioPorEmail(direccionDeMail);
     if (!usuario) {
       return res.status(404).send(`El email informado ${email} no está registrado`);
     }
   } catch (error) {
       return res.status(500),send('error inesperado al tratar de reestablecer la contraseña')
   }
+
   newPassword=crypto.createHmac('sha256','palabraSecreta').update(newPassword).digest('base64')
+
   if (isValidPassword(newPassword,usuario.password)) {
     return res.status(403).send('la contraseña no puede ser igual a la anteriormente registrada')
   }
+  newPassword=createHash(newPassword);
   usuario.password=newPassword
+ 
+
   try {
     await usersServices.actualizarUsuario(email,usuario)
-    res.status(201).send('contraseña actualizada')
+    return res.render('../views/login',{mostrarMensaje:true,error:false, mensaje:'contraseña actualizada, debes hacer login'});
+    // return res.status(201).send('contraseña actualizada')
   } catch (error) {
     return res.status(500),send('error inesperado al tratar de actualizar la contraseña')
   }
-  return res.redirect('/login')
 }
 
 function validarCorreoElectronico(correo) {

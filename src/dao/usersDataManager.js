@@ -88,8 +88,9 @@ async actualizarUsuario  (email,usuario)
     
     if (existingUser) {        
       existingUser.typeofuser= usuario.typeofuser
+      existingUser.password=usuario.password
       await existingUser.save();
-      console.log ('** usuario actualizado**')
+    
       return ;
     } else {
       console.error ('**** email no existe ****')

@@ -76,15 +76,18 @@ usernameField:'email', passReqToCallback : true
     if (!username || !password) {
        return done (null,false)
     }
-    password=crypto.createHmac('sha256','palabraSecreta').update(password).digest('base64')
   
+    password=crypto.createHmac('sha256','palabraSecreta').update(password).digest('base64')
+
     req.usuario = await usersServices.obtenerUsuarioPorEmail({username })
   
     if(!req.usuario) {
       return done (null,false)
     } else {
-      
+     
     if (!isValidPassword(password,req.usuario.password)) {
+
+   
       return done (null,false)
     } 
     

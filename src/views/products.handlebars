@@ -15,6 +15,7 @@
                 <th>Categoría</th>
                 <th>Precio</th>
                 <th>Existencias</th>
+                <th>Propietario</th>
                 <th>Agregar al carrito</th>
             </tr>
         </thead>
@@ -28,6 +29,7 @@
                     <td>{{category}}</td>
                     <td>{{price}}</td>                    
                     <td>{{stock}}</td>
+                    <td>{{owner}}</td>
                     <td>
                         <button class="addToCartButton" data-productid="{{_id}}">Agregar al carrito</button>
                     </td>
@@ -48,9 +50,9 @@
                     })
                     .then(function (response) {
                         if (response.ok) {
-                            console.log ('carrito creado')
+                            console.log ('agregado al carrito')
                         } else {
-                            console.log ('*** error al crear el carrito')
+                            console.log ('no agregado al carrito')
                         } 
                     })
                     .catch(function (error) {

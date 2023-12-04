@@ -3,9 +3,12 @@
 <h2>Recuperación de contraseña:</h2>
 <hr>
 <br> 
-{{#if error}}
+{{#if mostrarMensaje}}
 <div class=error>
-    {{errorDetail}}
+    {{mensaje}}
+</div>
+<div>
+    Puedes solicitar un nuevo envio del mail para recuperar tu contraseña
 </div>
 {{/if}}
 

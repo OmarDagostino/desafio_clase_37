@@ -79,7 +79,6 @@ async function agregarProducto(req, res) {
       customStatusCode=error.codigo;
       throw (error);
     } 
-    console.log ('** productID**',productId)
     const existingProduct = cart.products.find((p) => p.productId == productId);
     if (existingProduct) {
       existingProduct.quantity += quantity;

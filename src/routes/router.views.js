@@ -3,6 +3,7 @@ import handlebars from 'express-handlebars';
 import {Router} from 'express';
 import path from 'path';
 import {authUser,auth,auth2 } from '../middlewares/authMiddle.js';
+import { validaJWT } from '../middlewares/validaJWT.js';
 import __dirname from '../util.js';
 import {cartModel} from '../models/cart.model.js';
 import {productModel} from '../models/product.model.js';
@@ -82,8 +83,9 @@ router.get('/premium', auth, (req,res)=>{
   
   menuManagement (req,res,[1,0,0,0,1,1,1,1,0,0])
   let typeofuser=req.session.usuario.typeofuser
+  const name= req.session.usuario.name
   res.setHeader('Content-Type','text/html');
-  res.status(200).render('premium',{typeofuser,mostrarMenu0,mostrarMenu1,mostrarMenu2,mostrarMenu3,mostrarMenu4,mostrarMenu5,mostrarMenu6,mostrarMenu7,mostrarMenu8,mostrarMenu9,mostrarMenu10});
+  res.status(200).render('premium',{typeofuser,name, mostrarMenu0,mostrarMenu1,mostrarMenu2,mostrarMenu3,mostrarMenu4,mostrarMenu5,mostrarMenu6,mostrarMenu7,mostrarMenu8,mostrarMenu9,mostrarMenu10});
 });
 
 // ruta para la vista del administrador
@@ -115,7 +117,8 @@ router.get('/visualizarProductos',auth,async (req,res)=> {
           price: product.price,
           code: product.code,
           category: product.category,
-          stock: product.stock
+          stock: product.stock,
+          owner:product.owner
   }})
 
   res.setHeader('Content-Type','text/html');
@@ -166,7 +169,8 @@ router.get('/modificarProductos',auth,async (req,res)=> {
       price: product.price,
       code: product.code,
       category: product.category,
-      stock: product.stock
+      stock: product.stock,
+      owner:product.owner
   }});
   res.setHeader('Content-Type','text/html');   
   if (error) {res.status(400).render('modificarProductos',{renderedProducts,error,errorDetail, typeofuser, mostrarMenu0,mostrarMenu1,mostrarMenu2,mostrarMenu3,mostrarMenu4,mostrarMenu5,mostrarMenu6,mostrarMenu7,mostrarMenu8,mostrarMenu9,mostrarMenu10});
@@ -229,7 +233,8 @@ router.get('/borrarProductos',auth,async (req,res)=> {
       price: product.price,
       code: product.code,
       category: product.category,
-      stock: product.stock
+      stock: product.stock,
+      owner:product.owner
     }
   });
 
@@ -255,8 +260,8 @@ router.get('/login', auth2, (req,res)=>{
     res.status(200).render('login',{error,errorDetail,typeofuser, mostrarMenu0,mostrarMenu1,mostrarMenu2,mostrarMenu3,mostrarMenu4,mostrarMenu5,mostrarMenu6,mostrarMenu7,mostrarMenu8,mostrarMenu9,mostrarMenu10});
 });
 
-// ruta para recuperar contraseña
-router.get('/forgot', auth2, (req,res)=>{
+// ruta para solicitar la recuperacion de la contraseña
+router.get('/forgot', auth2, (req,res,mostrarMensaje,mensaje)=>{
  
   menuManagement (req,res,[1,1,0,1,0,0,0,0,0,0])
   let typeofuser='' ;
@@ -266,9 +271,19 @@ router.get('/forgot', auth2, (req,res)=>{
     error=true,
     errorDetail=req.query.error
   }
+ 
     res.setHeader('Content-Type','text/html');
-    res.status(200).render('forgot',{error,errorDetail,typeofuser, mostrarMenu0,mostrarMenu1,mostrarMenu2,mostrarMenu3,mostrarMenu4,mostrarMenu5,mostrarMenu6,mostrarMenu7,mostrarMenu8,mostrarMenu9,mostrarMenu10});
+    res.status(200).render('forgot',{error,errorDetail,typeofuser, mostrarMenu0,mostrarMenu1,mostrarMenu2,mostrarMenu3,mostrarMenu4,mostrarMenu5,mostrarMenu6,mostrarMenu7,mostrarMenu8,mostrarMenu9,mostrarMenu10,mostrarMensaje,mensaje});
 });
+
+// ruta para recuperar la contraseña 
+
+router.get('/recupera',validaJWT,(req,res)=>{
+
+let usuario=req.decoded.email
+res.setHeader('Content-Type','text/html');
+res.status(200).render('recupera',{usuario})
+})
 
 // ruta para la vista del LOGIN con github
 router.get('/loginGitHub', auth2, (req,res)=>{
@@ -343,7 +358,8 @@ router.get('/products', auth,  async (req,res) => {
         price: product.price,
         code: product.code,
         category: product.category,
-        stock: product.stock
+        stock: product.stock,
+        owner: product.owner
       };
       
     });

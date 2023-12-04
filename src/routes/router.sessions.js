@@ -1,6 +1,7 @@
 import {Router} from 'express';
 import bodyParser from 'body-parser';
 import usersController from '../controllers/usersController.js';
+import { authUser } from '../middlewares/authMiddle.js';
 export const router = Router ();
 router.use(bodyParser.urlencoded({ extended: true }));
 import passport from 'passport'; 
@@ -56,11 +57,11 @@ router.get('/current',dtousuario, usersController.current)
 
 // actualizar tipo de usuario
 
-router.get('/premium/:email',usersController.premium)
+router.get('/premium/:email',authUser, usersController.premium)
 
 // re-establecer contraseña
 
 router.post('/forgot', usersController.forgot)
 
-router.get('/recuperacion', usersController.recuperacion)
+router.post('/recuperacion', usersController.recuperacion)
   
